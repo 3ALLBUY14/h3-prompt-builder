@@ -83,7 +83,31 @@ N/A（或 1-3 句配乐描述）
 
 ### 标签体系
 
-`<Subject N>`（定义的主体）、`<Picture N>`（图片）、`<Video N>`（视频）、`<Audio N>`（音频）。标签一经分配，在全部节中含义不变。
+`<Subject N>`（定义的主体）、`<Picture N>`（图片）、`<Video N>`（视频）、`<Audio N>`（音频）、`<Prop N>`（道具）。标签一经分配，在全部节中含义不变。
+
+#### `<Prop N>` 道具标签（实战扩展）
+
+当视频中有重要道具（伞、武器、乐器、信件等）需要跨镜头保持一致时，使用 `<Prop N>` 标签独立定义：
+```
+<Prop 1> from <Picture 2>. Black Chantilly-style lace parasol: Victorian rose
+floral patterns, scalloped ruffled borders, 8-rib black metal frame.
+```
+- 道具定义与角色定义分离，retention_analysis 中独立声明保留级别
+- 一张道具参考图可定义多个道具（如 `<Prop 1>` 和 `<Prop 2>` from same `<Picture N>`）
+
+#### `<Picture N>` 多用途说明
+
+一张 `<Picture N>` 在 Ref2VA 中可承担多种角色：
+
+| 用途 | 定义位置 | retention 写法 |
+|------|----------|---------------|
+| 人物外观参考 | `subject_definitions` 中被 `<Subject N>` 引用 | `fully_preserved per <Picture N>` |
+| 人设/性格参考 | `subject_definitions` 中独立行标注 | `fully_preserved — personality, expressions, and interaction style guided` |
+| 场景参考 | `subject_definitions` 中独立行标注 | `fully_preserved — [original] reinterpreted as [new scene] in Shot N` |
+| 道具参考 | `subject_definitions` 中被 `<Prop N>` 引用 | `fully_preserved per <Picture N>` |
+| 首帧/尾帧参考 | 指令行中引用 | 不在 retention 中声明 |
+
+**场景重构**：一张场景参考图可在不同 Shot 中被重新解读。例如 `<Picture 1>` 标注为 `foggy abandoned Gothic courtyard`，可在 Shot 1-2 中被重新解读为 `submerged underwater ruin`，在 Shot 3 中被重新解读为 `nighttime rocky seashore`。retention 中标注重新解读关系即可。
 
 ### summary 任务类型前缀
 
