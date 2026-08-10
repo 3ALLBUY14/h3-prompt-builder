@@ -1,4 +1,4 @@
-# H3 八种风格专项详细指南
+# H3 十种风格专项详细指南
 
 来源：MiniMax H3 官方 Skill 仓库蒸馏（https://github.com/MiniMax-AI/MiniMax-H3/tree/main/skills）
 
@@ -316,6 +316,106 @@ flat bold color field, black-and-white halftone photographic cut-outs, selective
 
 ---
 
+## 9. 电竞角色展示生成器
+
+### 定位
+多角色宣传视频，每人专属配色、粒子效果、签名动作，音乐驱动的 speed-ramp 节奏，末幕全员汇聚。适合电竞战队、虚拟偶像团、角色集结宣传。
+
+### 核心流程
+```
+需求确认(角色数+时长) → 每人参考图确认 → [SHARED GUARDRAILS] 定义 → [APPEARANCE RULES] 定义 → 逐人差异化锚点设计 → 逐镜头 speed-ramp 撰写 → 末幕群像布局 → 精简压缩 → 质量自检
+```
+
+### 关键设计
+
+**[SHARED GUARDRAILS]（全文只写一次）**：
+- 光照：THICK BRIGHT CONTINUOUS signature-color RIM-LIGHT OUTLINE — DOMINANT, ALWAYS VISIBLE
+- 调色：steely cold cinematic grading / icy blue undertones / desaturated cold tones
+- 静默：ALL subjects SILENT (no speaking, no lip movement)
+- 音乐驱动：dark cinematic-trap / electronic, 140 BPM half-time, D minor
+- 速度结构：BEAT 1 (0.4s) FAST ENTRY → BEAT 2 (0.8s) SLOW-MOTION → BEAT 3-4 (1.0s) NORMAL-SETTLE
+- 镜头距离：MEDIUM — NO face close-up
+
+**[APPEARANCE RULES]（全文只写一次）**：
+- Shots 1-N: each shows ONLY its assigned `<Subject N>` — NO skipping, NO substitution
+- Shot M (末幕): ALL N appear SIMULTANEOUSLY — EXACTLY N, NO duplicates
+
+**每个角色的差异化锚点**：
+- 刘海类型（唯一区分词 + 括号短注对比）
+- 服装领型（crew-neck / off-shoulder / v-neck / boat-neck / round-neck）
+- 配色（7 色 MAXIMALLY DISTINCT）
+- 粒子效果（每人不同）
+- 签名动作（每人不同）
+- 镜头分配（Shot N solo + Shot M POSITION）
+
+### 末幕群像设计
+- 布局：TOP ROW + BOTTOM ROW，每位置一行短标签引用
+- 汇聚效果：seven-color particles CONVERGE → ENERGY BURST
+- 文字：NEON GLITCH FONT 标题 + 字幕
+- 人数约束：EXACTLY N, NO duplicates（只写一次）
+
+### 精简规则（必须执行）
+- `summary`：结构概述（时长+风格+主体数量+核心机制+全局约束），不逐人复述
+- `retention_analysis`：每角色一行 `fully_preserved per <Picture N>`，不重复特征
+- `detailed_description`：每镜头用短标签引用角色（如 `<S1> icy-cyan frost-shards headphone-sweep`），只写运镜+音乐层+独有信息
+- 详见 `references/optimization-guide.md`
+
+### 不适用
+单人展示（用通用 Ref2VA）、需要角色说话的场景（用通用 Ref2VA + 对白规则）
+
+---
+
+## 10. 多幕叙事转场生成器
+
+### 定位
+多幕叙事视频，通过物理转场事件（气泡/水母/光爆/烟雾/遮挡）驱动幕间切换，每幕可以是完全不同的场景和美学。适合奇幻/梦境/哥特/童话风格视频。
+
+### 核心流程
+```
+需求确认(幕数+时长+素材) → 多世界美学设计 → 转场事件设计 → 角色定义(含 Prop) → 场景重构定义 → 逐幕撰写 → 转场衔接 → 质量自检
+```
+
+### 关键设计
+
+**多世界美学**：
+- 每幕有独立的美学定义（如：Act 1-2 水下梦境 → Act 3 月光海岸）
+- 转场由物理事件触发，不是简单的 cross-dissolve
+- 场景重构：一张 `<Picture N>` 可在不同 Shot 中被重新解读
+
+**转场事件类型**：
+| 转场类型 | 适用场景 | 写法 |
+|----------|----------|------|
+| 气泡爆发 | 水下→其他 | bubble cloud fills frame, whites out image, camera drifts through |
+| 生物遮挡 | 梦境→现实 | jellyfish/creature drifts between camera and subject, glow fills frame |
+| 光爆闪白 | 高能→静默 | flash of light bursts from object, frame whites out, scene transforms |
+| 烟雾弥漫 | 暖调→冷调 | smoke/dense fog fills frame, when it clears scene has changed |
+| 遮挡过场 | 任意切换 | object/person passes close to lens, blocking entire view briefly |
+
+**道具定义 `<Prop N>`**：
+- 道具用独立标签定义，与角色标签分离
+- retention_analysis 中独立声明保留级别
+- 示例：`<Prop 1> from <Picture 2>. Black Chantilly-style lace parasol.`
+
+**场景重构**：
+- `<Picture N>` 标注为 scene reference 时，可在不同 Shot 中被重新解读
+- retention 中标注：`fully_preserved — [original] reinterpreted as [new scene] in Shot N`
+- 示例：courtyard → underwater ruin (Shots 1-2) → nighttime seashore (Shot 3)
+
+**人设参考**：
+- `<Picture N>` 可作为"人设参考"引导角色性格、表情风格、互动关系
+- 不定义具体外观（外观由另一张 Picture 提供）
+- retention 中标注：`fully_preserved — personality, expressions, and interaction style guided`
+
+### 跨幕角色一致性
+- 角色外观通过 `fully_preserved per <Picture N>` 保证跨幕一致
+- 幕间转场不需要 `<scenetrans>` 标签（物理转场事件自然衔接）
+- 服装可在幕间变化（如从干燥→湿透），但角色身份不变
+
+### 不适用
+单场景视频、无转场需求的简单叙事
+
+---
+
 ## 风格选择速查表
 
 | 需求关键词 | 推荐风格 |
@@ -331,3 +431,5 @@ flat bold color field, black-and-white halftone photographic cut-outs, selective
 | 模特/服装/时尚/展示 | 通用 Ref2VA（非风格专项） |
 | 直播/带货/教程 | 通用 Ref2VA（非风格专项） |
 | 循环/无缝/表情 | 通用 Ref2VA（非风格专项） |
+| 电竞/战队/集结/多角色 | 电竞角色展示 |
+| 多幕/梦境/转场/奇幻/哥特 | 多幕叙事转场 |

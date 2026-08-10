@@ -1,12 +1,12 @@
 ---
 name: h3-prompt-builder
-description: "MiniMax H3视频提示词生成全流程指南。整合5种模式选择、8种风格模板、运镜/对白/音频规则、常见坑与质量自检。当用户需要写H3视频提示词、制作H3视频、或提到T2VA/I2VA/FL2VA/L2VA/Ref2VA时使用。"
-version: 1.0.0
+description: "MiniMax H3视频提示词生成全流程指南。整合5种模式选择、8种风格模板、运镜/对白/音频规则、冗余压缩优化、常见坑与质量自检。当用户需要写H3视频提示词、制作H3视频、或提到T2VA/I2VA/FL2VA/L2VA/Ref2VA时使用。"
+version: 2.0.0
 ---
 
 # MiniMax H3 视频提示词生成指南
 
-为任意 AI agent 提供 MiniMax H3 视频提示词的完整生成流程。从需求分析到最终输出，覆盖五种生成模式、八种风格模板、运镜/对白/音频规则、常见坑对策与质量自检清单。
+为任意 AI agent 提供 MiniMax H3 视频提示词的完整生成流程。从需求分析到最终输出，覆盖五种生成模式、八种风格模板、运镜/对白/音频规则、冗余压缩优化、常见坑对策与质量自检清单。
 
 ## H3 基础规格
 
@@ -21,7 +21,7 @@ version: 1.0.0
 ## 工作流
 
 ```
-1. 需求分析 → 2. 模式选择 → 3. 风格匹配 → 4. 提示词撰写 → 5. 质量自检 → 6. 交付
+1. 需求分析 → 2. 模式选择 → 3. 风格匹配 → 4. 提示词撰写 → 5. 冗余压缩 → 6. 质量自检 → 7. 交付
 ```
 
 ### 步骤 1：需求分析
@@ -122,6 +122,46 @@ non_diegetic_music:
 N/A（或配乐描述）
 ```
 
+#### Ref2VA 多主体高级模板（3+ 主体适用）
+
+当有 3 个以上主体时，使用以下结构确保信息不冗余：
+
+```
+subject_definitions:
+[SHARED GUARDRAILS] [全局规则：光照/调色/静默/音乐/镜头距离/速度结构，出现1次]
+[APPEARANCE RULES] [防漏人/防重复/防换人规则，集中1次]
+<Subject 1> from <Picture 1>. [差异化锚点 + 唯一性特征]. Color: XXX. Particle: XXX. Action: XXX. Shot N (solo) + Shot M (POSITION).
+<Subject 2> from <Picture 2>. ...
+[SHARED TRAITS] All share: [共有特征]. Distinguished by: [区分维度].
+<Prop 1> from <Picture N>. [道具定义]（如有）
+<Picture M> — scene reference: [场景定义]（如有）
+
+summary:
+[结构概述：时长 + 风格 + 主体数量 + 核心机制 + 全局约束 + 末幕概述]
+（不逐人复述细节）
+
+retention_analysis:
+<Subject 1> (Shot N, Shot M POSITION): fully_preserved per <Picture 1>.
+（不重复外貌特征）
+
+detailed_description:
+[风格句].
+[Shot 1] [运镜 + 独有信息] <Subject 1> (短标签): [动作 + 音效]
+[Shot 8] [布局指令] <S1> 短标签, <S2> 短标签, ...
+
+overall_soundscape:
+[1-4 句声音总结]
+
+non_diegetic_music:
+N/A（或配乐描述）
+```
+
+**关键规则**：
+- `[SHARED GUARDRAILS]` 和 `[APPEARANCE RULES]` 各只出现一次，全文不重复
+- 每个角色的完整定义只在 `subject_definitions` 中出现一次
+- `detailed_description` 和末幕用 2-4 个大写关键词短标签引用（如 `<S1> icy-cyan frost-shards headphone-sweep`）
+- 详见 `references/optimization-guide.md`
+
 #### 关键帧对齐指令行（必须精确逐字）
 
 - **I2VA**: `For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.`
@@ -130,7 +170,33 @@ N/A（或配乐描述）
 
 `N` 为最后一个 shot 的序号，`S.SS` 为有效视频时长（两位小数）。
 
-### 步骤 5：核心写作规则
+### 步骤 5：冗余压缩
+
+撰写完成后，对提示词进行冗余压缩。完整精简优化标准见 `references/optimization-guide.md`。
+
+#### 核心原则
+
+1. **单一信息源（SSOT）**：每条信息只在一个权威位置完整定义，其他位置用短标签引用
+2. **共享规则合并**：所有角色/镜头共享的规则提取到 `[SHARED GUARDRAILS]`，全文只写一次
+3. **防错指令集中**：防漏人/防重复/防换人指令提取到 `[APPEARANCE RULES]`，不逐人重复
+4. **强调词降级**：`CRITICAL`/`ABSOLUTE`/`FORBIDDEN` 全文不超过 5 次
+5. **信息分层**：全局规则 → 个体定义 → 执行指令 → 概览摘要，每层只写本层独有信息
+
+#### 何时需要压缩
+
+- 主体数 ≥ 3 时，**必须**执行冗余压缩
+- 主体数 1-2 但提示词超过 3000 词时，建议执行
+- 简单 T2VA/I2VA（< 1500 词）可跳过
+
+#### 多主体字符管理
+
+| 主体数 | 典型词数 | 策略 |
+|--------|---------|------|
+| 1-2 | 2000-4000 | 正常撰写 |
+| 3-5 | 4000-6000 | 精简每个 Subject 外观，合并共享特征 |
+| 7-8+ | 6000-7000 | 极度精简：仅保留唯一性锚点，用短标签引用，共享规则全部提取 |
+
+### 步骤 6：核心写作规则
 
 #### 镜头与切换
 
@@ -185,7 +251,7 @@ N/A（或配乐描述）
 | 8 秒 | 36 字 |
 | 10 秒 | 45 字 |
 
-### 步骤 6：常见坑与对策
+### 步骤 7：常见坑与对策
 
 | 常见问题 | 对策 |
 |----------|------|
@@ -202,7 +268,7 @@ N/A（或配乐描述）
 | Ref2VA 漏标音色来源 | 首次台词必须标注 `using the voice timbre referenced from <Audio N>` |
 | Base 指令行不在第一行 | 指令行必须是提示词第一行，后空一行再写三字段 |
 
-### 步骤 7：质量自检清单
+### 步骤 8：质量自检清单
 
 撰写完成后逐项检查：
 
@@ -221,7 +287,17 @@ N/A（或配乐描述）
 - [ ] 循环收尾：循环视频末尾有收尾句
 - [ ] 官方标签：用 `<Picture N>`/`<Subject N>`/`<Audio N>` 而非 `@图片N`
 
-### 步骤 8：交付
+### 精简检查（多主体场景必查）
+- [ ] 每条信息只在一个权威位置完整定义，其他位置只引用不复述
+- [ ] `summary` 没有逐人复述配色/粒子/动作清单
+- [ ] `retention_analysis` 没有重复外貌特征描述
+- [ ] `detailed_description` 中角色特征用短标签引用而非完整复述
+- [ ] 共享规则只在 `[SHARED GUARDRAILS]` 出现一次
+- [ ] 防错指令集中在一个 `[APPEARANCE RULES]` 块中
+- [ ] `CRITICAL`/`ABSOLUTE`/`FORBIDDEN` 全文不超过 5 次
+- [ ] 每个角色有 2-3 个唯一性锚标签
+
+### 步骤 9：交付
 
 - 将完整提示词放入代码块中交付
 - 如有多个镜头，附分镜表概览
@@ -230,8 +306,9 @@ N/A（或配乐描述）
 ## 参考文件
 
 - `references/mode-formats.md` — 五种模式官方格式完整速查（含指令行精确措辞、运镜词表、共享写作规则、官方完整示例）
-- `references/style-guide.md` — 八种风格专项详细指南（含核心流程、关键设计、质量自检要点）
-- `references/prompt-examples.md` — 实际案例参考库（模特展示、循环讲解、直播带货等场景）
+- `references/style-guide.md` — 十种风格专项详细指南（含核心流程、关键设计、质量自检要点）
+- `references/prompt-examples.md` — 实际案例参考库（模特展示、循环讲解、直播带货、电竞天团、多幕叙事等场景）
+- `references/optimization-guide.md` — 提示词精简优化标准（六大压缩原则、字段级精简指南、自检清单、工作流）
 
 ## 跨风格通用方法论
 

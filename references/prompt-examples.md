@@ -165,6 +165,164 @@ non_diegetic_music: A low electronic pulse at a slow tempo, ending immediately a
 
 ---
 
+## 案例 7：Ref2VA 7 人电竞天团宣传（精简优化标杆案例）
+
+**场景**：7 个真人女性角色，每人专属配色 + 粒子效果 + 签名动作，音乐驱动 speed-ramp 节奏，末幕 7 人汇聚。17 秒，Ref2VA 模式，7 张参考图。
+
+**精简价值**：此案例从 v4.0（~5380 词）精简到 v4.1（~2235 词），**词数减少 58%，信息零丢失**，是冗余压缩的最佳实践标杆。
+
+**设计要点**：
+- 使用 `[SHARED GUARDRAILS]` 统一光照/调色/静默/音乐/速度结构规则（全文 1 次）
+- 使用 `[APPEARANCE RULES]` 集中防漏人/防重复/防换人指令（全文 1 次，替代 v4.0 中 20+ 次重复）
+- 每个角色用差异化锚点区分（刘海类型 + 服装领型 + 配色）
+- `detailed_description` 和末幕用短标签引用（如 `<S1> icy-cyan frost-shards headphone-sweep`）
+- 全部角色 SILENT，纯视觉 + 音乐驱动
+
+**subject_definitions 片段（精简版）**：
+```
+[SHARED GUARDRAILS] 7 DISTINCT real women, each from her own <Picture N>. Each
+wears a THICK BRIGHT CONTINUOUS signature-color RIM-LIGHT OUTLINE — DOMINANT
+lighting, ALWAYS VISIBLE, NEVER fades. Each has a UNIQUE PARTICLE EFFECT. ENTIRE
+VIDEO: steely cold cinematic grading. ALL subjects SILENT. MUSIC-DRIVEN: dark
+cinematic-trap / electronic, 140 BPM half-time, D minor. Each solo shot = one
+musical cycle: BEAT 1 (0.4s) SPEED-RAMP FAST ENTRY, BEAT 2 (0.8s) SLOW-MOTION,
+BEAT 3-4 (1.0s) NORMAL-SPEED SETTLE.
+
+[APPEARANCE RULES] Shots 1-7: each shows ONLY its assigned <Subject N> — NO
+skipping, NO substitution. Shot 8: ALL 7 appear SIMULTANEOUSLY — EXACTLY SEVEN,
+NO duplicates, NO extras.
+
+<Subject 1> from <Picture 1>. BLUNT BANGS (only one with blunt bangs). NARROW
+ELONGATED SINGLE-FOLD EYES, cold high-cold gaze. Oval face, pale-pink lips, fair
+skin. CLOSED BLACK CREW-NECK KNIT (only crew-neck). Color: ICY-CYAN. Particle:
+FROST-CRYSTAL shards. Action: grips headphone cup, SWEEPS it back. Shot 1 (solo)
++ Shot 8 (TOP-FAR-LEFT).
+
+<Subject 2> from <Picture 2>. SHORT OBLIQUE LEFT-PARTED BANGS (shorter than
+S7's). LARGE ROUND DEER-LIKE EYES. Color: COOL-VIOLET. Particle: VIOLET
+LIGHTNING arcs. Action: REVERSE-CROSS arm snap. Shot 2 + Shot 8 (TOP-CENTER-LEFT).
+```
+
+**detailed_description 片段（精简版 vs 冗余版对比）**：
+```
+// 精简版（~60 词）：
+[Shot 1] SPEED-RAMP on <Subject 1> (BLUNT BANGS, CREW-NECK, ICY-CYAN): BEAT 1
+camera AGGRESSIVE push-in + handheld drift, rim-light + frost-crystal shards
+visible. BEAT 2 SLOW-MOTION: headphone-sweep action, cold side-gaze. BEAT 3-4
+holds pose. Icy-cyan back-light + vertical cold-steam smoke. Music: sub-bass +
+trap snare + pad + arpeggio.
+
+// 冗余版（~180 词，其中 ~100 词是对 subject_definitions 的复述）：
+[Shot 1] A MUSIC-DRIVEN AGGRESSIVE SPEED-RAMP on <Subject 1> at MEDIUM distance
+— this shot MUST show <Subject 1> from <Picture 1> (BLUNT BANGS, CREW-NECK
+sweater, ICY-CYAN rim-light): ON BEAT 1, sub-bass + trap snare punches in as
+the camera AGGRESSIVELY pushes in... (后续 150 词省略)
+```
+
+**末幕片段（精简版）**：
+```
+[Shot 8] EXACTLY 7 DIFFERENT WOMEN, NO duplicates. TOP ROW (left→right):
+<S1> icy-cyan frost-shards headphone-sweep, <S2> cool-violet lightning
+reverse-cross, <S3> forest-green wind-swirl mouse-flick, <S4> amber-orange
+solar-flare controller-spin. MIDDLE: seven-color particles CONVERGE to center,
+title "高能集结" in NEON GLITCH FONT. BOTTOM ROW: <S5> neon-pink glitch
+keyboard-flip, <S6> champagne pearl chair-spin, <S7> crimson fire-ember
+hair-flip + fist-clench. Music: FULL BEAT DROP.
+```
+
+**retention_analysis 片段（精简版）**：
+```
+<Subject 1> (Shot 1, Shot 8 TOP-FAR-LEFT): fully_preserved per <Picture 1>.
+<Subject 2> (Shot 2, Shot 8 TOP-CENTER-LEFT): fully_preserved per <Picture 2>.
+...（7 行，每行 10 词，共 ~70 词）
+```
+
+**关键经验**：
+- `[SHARED GUARDRAILS]` + `[APPEARANCE RULES]` 将共享规则从重复 11 次降到 1 次
+- 短标签引用将末幕从每人 ~30 词降到每人 ~8 词（-73%）
+- 防漏人指令从 20+ 次、~800 词降到 1 次、~30 词（-96%）
+- 详见 `references/optimization-guide.md` 中的完整压缩前后量化对比
+
+---
+
+## 案例 8：Ref2VA 多幕叙事转场（哥特裙水下梦境 → 海岸夜景）
+
+**场景**：2 位哥特裙模特，3 幕叙事（水下梦境 → 水母遮挡过场 → 海岸夜景现实），17 秒，4 张参考图。
+
+**设计要点**：
+- 使用 `<Prop 1>` 标签定义道具（黑蕾丝伞），与角色标签分离
+- 一张 `<Picture 1>` 在不同 Shot 中被重新解读为不同场景（水下遗迹 → 海岸礁石）
+- 物理转场驱动幕间切换（气泡爆发 → 水母遮挡 → 场景切换）
+- `<Picture 4>` 作为"人设参考"引导性格气质、表情风格、互动关系
+- 跨幕角色一致性通过 `fully_preserved per <Picture 3>` 保证
+
+**subject_definitions 片段**：
+```
+<Subject 1> from <Picture 3>, <Picture 4>. Pale skin, fine almond-shaped dark
+eyes, composed neutral expression. Long straight black hair with BLUNT BANGS,
+white lace maid-style headband. Black long-sleeve Gothic Lolita dress: white
+lace Peter Pan collar with large black bow, white corset lace-up, three-tier
+white lace ruffle hem. White over-the-knee stockings. Black Mary Jane shoes.
+
+<Subject 2> from <Picture 3>, <Picture 4>. Pale skin, blue-tinted irises, soft
+gentle expression. Long straight light-golden-blonde hair, BLUNT BANGS, small
+black formal hat with burgundy bow. Black STRAPLESS Gothic Lolita dress with
+white lace sweetheart neckline, cross-lace corset front.
+
+<Prop 1> from <Picture 2>. Black Chantilly-style lace parasol: Victorian rose
+floral patterns, scalloped ruffled borders, 8-rib black metal frame.
+
+<Picture 1> — scene reference: foggy abandoned Gothic courtyard, reinterpreted
+as a submerged underwater ruin in Shots 1-2, then as a nighttime rocky seashore
+in Shot 3.
+```
+
+**summary 片段**：
+```
+[reference generation] A 17-second three-shot dream narrative: a giant clam shell
+rests in a rich underwater ruin (<Picture 1>). <Subject 1> and <Subject 2>
+(<Picture 3>) pry it open, revealing a radiant pearl — bubbles erupt as
+transition. Both models float weightlessly holding the pearl, circle each other,
+lean in to kiss it — a jellyfish drifts between them as second transition. After
+it clears, both sit fully clothed but soaking wet on a moonlit rocky shore,
+roasting marshmallows over a campfire, the parasol resting beside them.
+```
+
+**detailed_description 转场技巧**：
+```
+[Shot 1] ... At 00:05, a massive burst of silver air bubbles erupts from inside
+the shell — the bubble cloud fills the entire frame, gradually whites out the
+image — the camera drifts upward through the bubble cloud, dissolving into pure
+silver-white luminescence.
+
+[Shot 2] At 00:06.000, the bubble cloud thins... At the exact instant their lips
+are about to touch the pearl, a luminous jellyfish drifts into frame — its
+tentacles drag across the lens, the frame fully consumed by jellyfish glow.
+
+[Shot 3] At 00:12.000, the jellyfish glow fades — the scene has transformed.
+Nighttime rocky seashore, playing at natural real-time speed...
+```
+
+**retention_analysis 片段**：
+```
+<Subject 1> (Shot 1, Shot 2, Shot 3): fully_preserved per <Picture 3>.
+<Subject 2> (Shot 1, Shot 2, Shot 3): fully_preserved per <Picture 3>.
+<Prop 1> (Shot 1, Shot 3): fully_preserved per <Picture 2>.
+<Picture 1> (scene reference): fully_preserved — courtyard architecture
+reinterpreted as underwater ruin (Shots 1-2) then nighttime seashore (Shot 3).
+<Picture 4> (character design reference): fully_preserved — both models'
+personality and interaction style guided throughout.
+```
+
+**关键经验**：
+- `<Prop N>` 标签让道具定义与角色定义分离，retention 中独立声明
+- 场景重构：一张 Picture 可在不同 Shot 中被重新解读（courtyard → underwater ruin → seashore）
+- 物理转场（气泡/水母）是比 cross-dissolve 更自然的幕间切换方式
+- `<Picture 4>` 作为"人设参考"扩展了 Picture 的用途：不仅定义外观，还引导性格和互动
+- 跨幕叙事不需要 `<scenetrans>` 标签，因为幕间有物理转场事件自然衔接
+
+---
+
 ## 风格化案例参考
 
 ### 旗袍模特6模特系列
