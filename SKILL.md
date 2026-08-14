@@ -1,7 +1,7 @@
 ---
 name: h3-prompt-builder
-description: "MiniMax H3视频提示词生成全流程指南。整合5种模式选择、8种风格模板、运镜/对白/音频规则、冗余压缩优化、常见坑与质量自检。当用户需要写H3视频提示词、制作H3视频、或提到T2VA/I2VA/FL2VA/L2VA/Ref2VA时使用。"
-version: 2.0.0
+description: "MiniMax H3视频提示词生成全流程指南。整合5种模式选择、8种风格模板、运镜/对白/音频规则、数字人对口型防火星语、冗余压缩优化、常见坑与质量自检。当用户需要写H3视频提示词、制作H3视频、或提到T2VA/I2VA/FL2VA/L2VA/Ref2VA时使用。"
+version: 2.1.0
 ---
 
 # MiniMax H3 视频提示词生成指南
@@ -231,6 +231,30 @@ N/A（或配乐描述）
 - 结尾截断台词：`<cutoff>`
 - 画面文字：英文双引号包裹，逐字保留，如 `A sign reading "营业中"`
 
+#### 数字人对口型专项规则（防火星语）
+
+台词归属必须三选一，禁止归属缺省（详见 `references/lipsync-guide.md`）：
+
+| 归属方式 | 画面要求 | 要点 |
+|----------|----------|------|
+| 口型同步 | 角色露脸，嘴部清晰可见 | `speaks to the camera` + `<d>` 台词；手持产品时用胸前持物中近景，不用纯手部特写 |
+| 明确画外音 | 露脸不说话或完全出镜均可 | `off-screen voiceover` + `lips remain completely closed` 双保险 |
+| 无台词 | 任意画面（纯产品 B-roll） | 不放 `<d>` 标签 |
+
+配套规则：
+
+- reference 模式（音色参考）下 `<d>` 台词按时间分段覆盖全程，空档会被火星语填充
+- 音频时长 ≤ 15s，超限会被强制压缩导致中段口胡，只能重录
+- 嘴部约束只用正面描述：`lips barely parting for each word` / `lips rest softly together`；负面句式（"never showing teeth"）会被反向聚焦导致呲牙
+- CTA 避免四字连读（"限时抢购"易口胡），改用"抢购吧"等短促词
+
+特效字规范：
+
+- 字体：`medium-weight elegant sans-serif`（不用 bold），描边 `subtle semi-transparent dark stroke`，背板 `semi-transparent dark blur backdrop`
+- 低饱和色板：柔金 #BFAA82（品牌）/ 暖白 #E8E2D8（内容）/ 灰绿 #9AAA9C（卖点）/ 柔砖红 #BC7A68（CTA）；避免 #D4AF37、#D4735A 等高饱和色
+- 长英文串拆分弹出（"AOIAOI礼盒"→ 先弹"AOI"再弹中文）；叠加文字与 `<d>` 台词同内容时改格式（"、"→"+"），防止重复渲染两行
+- 颈部描述极简：只写 choker 等饰品，不写肤色/光线/边界
+
 #### 音频规则
 
 - **overall_soundscape**：1-4 句，总结环境音、物理动作声、非语言人声。台词/唱歌/剧情内音乐不写这里。全程静音才写 `N/A`
@@ -267,6 +291,17 @@ N/A（或配乐描述）
 | 循环视频没有收尾句 | 结尾加 `The final action returns to the starting pose, allowing seamless looping.` |
 | Ref2VA 漏标音色来源 | 首次台词必须标注 `using the voice timbre referenced from <Audio N>` |
 | Base 指令行不在第一行 | 指令行必须是提示词第一行，后空一行再写三字段 |
+| 数字人念火星语 | 台词归属三选一：口型同步（露脸嘴清晰）/ 明确画外音（+嘴唇闭合）/ 无台词；禁止归属缺省 |
+| reference 模式台词空档出火星语 | `<d>` 台词按时间分段覆盖全程，不留空档 |
+| "不露齿"约束反而呲牙 | 删负面词，只写正面状态："lips rest softly together" |
+| 音频超 15s 中段加速口胡 | 音频控制在 14-15s，重录而非靠提示词补救 |
+| 产品特写 B-roll 念火星语 | 纯产品镜头不放 `<d>`，台词移到人物镜头或明确画外音 |
+| 手持产品特写火星语 | 改胸前持物中近景（面部+嘴部清晰入镜），不用纯手部特写 |
+| CTA 四字连读口胡 | 改短促词："抢购吧" |
+| 特效字长英文被误写（AOIAOI→AOI） | 拆分显示：先弹英文短词，再弹中文 |
+| 叠加文字与台词重复渲染两行 | 格式区分：台词"、"，叠加"+" |
+| 特效字配色俗气 | 低饱和莫兰迪色（#BFAA82/#E8E2D8/#9AAA9C/#BC7A68）+ medium-weight 字体 |
+| 颈部区域光线/肤色异常 | 颈部极简：只写 choker 等饰品，不写肤色/光线/边界 |
 
 ### 步骤 8：质量自检清单
 
@@ -286,6 +321,11 @@ N/A（或配乐描述）
 - [ ] 画面文字：英文双引号包裹
 - [ ] 循环收尾：循环视频末尾有收尾句
 - [ ] 官方标签：用 `<Picture N>`/`<Subject N>`/`<Audio N>` 而非 `@图片N`
+- [ ] 台词归属（数字人）：口型同步 / 明确画外音 / 无台词，三选一写清楚，无归属缺省
+- [ ] 台词覆盖：reference 模式下 `<d>` 台词覆盖全程无空档
+- [ ] 音频时长：≤ 15s
+- [ ] 嘴部描述：全部正面句式，无 "never/no teeth" 等负面词
+- [ ] 特效字：与台词格式区分、长文字拆分、低饱和色板 + medium-weight 字体
 
 ### 精简检查（多主体场景必查）
 - [ ] 每条信息只在一个权威位置完整定义，其他位置只引用不复述
@@ -309,6 +349,7 @@ N/A（或配乐描述）
 - `references/style-guide.md` — 十种风格专项详细指南（含核心流程、关键设计、质量自检要点）
 - `references/prompt-examples.md` — 实际案例参考库（模特展示、循环讲解、直播带货、电竞天团、多幕叙事等场景）
 - `references/optimization-guide.md` — 提示词精简优化标准（六大压缩原则、字段级精简指南、自检清单、工作流）
+- `references/lipsync-guide.md` — 数字人对口型实战指南（防火星语：台词归属三选一、五大原则、坑位清单、嘴部正面描述词库、特效字配色规范）
 
 ## 跨风格通用方法论
 
